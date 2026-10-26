@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { EVENT, dateLine, timeLine } from '../event.js';
+import { fitSize } from '../fit.js';
 import wordmarkUrl from '../assets/syntex-wordmark.png';
 
 const EASE = [0.16, 1, 0.3, 1];
@@ -66,7 +67,8 @@ export function GL({ children, camera = { position: [0, 0, 6], fov: 35 } }) {
   );
 }
 
-export function Details({ show, delay = 0.7 }) {
+export function Details({ show, delay = 0.7, w }) {
+  const colW = w * 0.263;
   const cols = [
     ['روز', dateLine, EVENT.year, false],
     ['ساعت', timeLine, '۴٫۵ ساعت', false],
@@ -83,7 +85,7 @@ export function Details({ show, delay = 0.7 }) {
           transition={{ duration: 0.9, delay: show ? delay + i * 0.09 : 0, ease: EASE }}
         >
           <span className="det-l">{label}</span>
-          <b className="det-v">{value}</b>
+          <b className="det-v" style={w ? { fontSize: fitSize(value, colW, w * 0.033, w * 0.02, 700) } : undefined}>{value}</b>
           <span className={`det-s${mono ? ' mono' : ''}`}>{sub}</span>
         </motion.div>
       ))}

@@ -36,10 +36,10 @@ function GuestRow({ g, i, active, canEdit, busy, onSelect, onSave, onRemove, onC
     <li className={`gr${active ? ' is-active' : ''}`} onClick={onSelect}>
       <span className="gr-n">{pad2(i + 1)}</span>
       <div className="gr-fields">
-        <input id={`gname-${g.id}`} aria-label="نام کامل" value={name} disabled={!canEdit}
+        <input id={`gname-${g.id}`} aria-label="اسم کامل" value={name} disabled={!canEdit}
           onChange={e => setName(e.target.value)} onBlur={commit} onKeyDown={key} onFocus={onSelect} />
-        <input id={`gcall-${g.id}`} className="gr-call" aria-label="با چه اسمی صدایش کنیم" value={call} disabled={!canEdit}
-          placeholder={`صدا زدن: ${firstName(name)}`} onChange={e => setCall(e.target.value)} onBlur={commit} onKeyDown={key} onFocus={onSelect} />
+        <input id={`gcall-${g.id}`} className="gr-call" aria-label="با چه اسمی صداش کنیم" value={call} disabled={!canEdit}
+          placeholder={`صداش می‌کنیم: ${firstName(name)}`} onChange={e => setCall(e.target.value)} onBlur={commit} onKeyDown={key} onFocus={onSelect} />
       </div>
       <div className="gr-act">
         <button type="button" className="chip" aria-label={`کپی لینک ${g.name}`} onClick={e => { e.stopPropagation(); onSelect(); onCopy(); }}>لینک</button>
@@ -102,7 +102,7 @@ export default function Panel() {
   const exportFailed = e => {
     if (isDeclined(e)) return;
     console.error(e);
-    flash('ساختن تصویر کار نکرد. یک بار دیگر امتحان کن.');
+    flash('ساختن عکس نشد. یه بار دیگه امتحان کن.');
   };
   const downloadOne = async i => {
     if (busy) return;
@@ -120,7 +120,7 @@ export default function Panel() {
     try {
       const zip = await zipAll({ concept, guests: roster }, (done, total) => setBusy({ kind: 'all', done, total }));
       await saveFile(`syntex-invites-${concept}.zip`, zip);
-      flash(`${fa(roster.length)} کارت ذخیره شد`);
+      flash(`${fa(roster.length)} تا کارت ذخیره شد`);
     } catch (e) { exportFailed(e); } finally { setBusy(null); }
   };
   const allLinks = () => roster.map((g, i) => `${g.name}: ${linkFor(i)}`).join('\n');
@@ -145,8 +145,8 @@ export default function Panel() {
       <section className="pn-ideas" aria-labelledby="ideas-t">
         <div className="pn-sec">
           <span className="eyebrow gold">ایده‌ها</span>
-          <h2 id="ideas-t">سه ایده برای کارت. یکی را انتخاب کن.</h2>
-          <p>هر سه با پاکت شروع می‌شوند: مهمان روی مهر می‌زند، پاکت باز می‌شود و کارت بیرون می‌آید. امتیازها با معیارهای داوری Awwwards است.</p>
+          <h2 id="ideas-t">سه تا ایده داریم، یکی‌شو انتخاب کن.</h2>
+          <p>هر سه تاش با یه پاکت شروع می‌شه: مهمون می‌زنه روی مهر، پاکت باز می‌شه و کارت میاد بیرون. امتیازها بر اساس معیارهای داوری Awwwards‌ه.</p>
         </div>
         <div className="ideas">
           {CONCEPTS.map(c => (
@@ -172,14 +172,14 @@ export default function Panel() {
               <button type="button" className="chip" onClick={() => setReplay(r => r + 1)}>از اول</button>
               <button type="button" className="chip" onClick={openFull}>تمام‌صفحه</button>
               <button type="button" className="chip" disabled={Boolean(busy)} onClick={() => downloadOne(idx)}>
-                {busy && busy.kind === 'one' && busy.index === idx ? 'در حال ساخت…' : 'دانلود PNG'}
+                {busy && busy.kind === 'one' && busy.index === idx ? 'داره ساخته می‌شه…' : 'دانلود PNG'}
               </button>
               {!isSample && <button type="button" className="chip chip--gold" onClick={() => copy(linkFor(idx), 'لینک کپی شد')}>کپی لینک</button>}
             </span>
           </div>
           <div className="pn-preview">
             <Experience key={`${concept}-${idx}-${roster[idx].name}-${replay}`} concept={concept} guests={roster} index={idx} embedded onPhase={setPhase} />
-            {phase === 'closed' && <span className="pn-preview-tip">پیش‌نمایش زنده است؛ روی مهر بزن.</span>}
+            {phase === 'closed' && <span className="pn-preview-tip">پیش‌نمایش زنده‌ست؛ بزن روی مهر.</span>}
           </div>
           <div className="jury">
             <div className="jury-total">
@@ -202,25 +202,25 @@ export default function Panel() {
 
         <aside className="pn-guests" aria-labelledby="guests-t">
           <div className="pn-sec">
-            <span className="eyebrow gold">مهمان‌ها</span>
-            <h2 id="guests-t">{isSample ? 'اسم‌ها را اینجا بنویس' : `${fa(st.guests.length)} نفر`}</h2>
-            {!st.canEdit && <p className="muted">این فهرست را فقط سازنده‌ی صفحه می‌تواند تغییر دهد.</p>}
+            <span className="eyebrow gold">مهمون‌ها</span>
+            <h2 id="guests-t">{isSample ? 'اسم‌ها رو اینجا بنویس' : `${fa(st.guests.length)} نفر`}</h2>
+            {!st.canEdit && <p className="muted">این فهرست رو فقط سازنده‌ی صفحه می‌تونه عوض کنه.</p>}
           </div>
           {st.canEdit && (
             <>
               <form className="add" onSubmit={add}>
-                <input id="add-name" value={draft} onChange={e => setDraft(e.target.value)} placeholder="نام و نام خانوادگی" autoComplete="off" />
-                <button type="submit" className="btn btn--gold">افزودن</button>
+                <input id="add-name" value={draft} onChange={e => setDraft(e.target.value)} placeholder="اسم و فامیل" autoComplete="off" />
+                <button type="submit" className="btn btn--gold">اضافه کن</button>
               </form>
               <details className="bulk">
-                <summary>چند اسم با هم</summary>
-                <textarea id="bulk-names" rows={5} value={bulk} onChange={e => setBulk(e.target.value)} placeholder={'هر اسم در یک خط\nسارا محمدی\nعلی رضایی'} />
-                <button type="button" className="btn" onClick={addBulk}>افزودن همه</button>
+                <summary>چند تا اسم با هم</summary>
+                <textarea id="bulk-names" rows={5} value={bulk} onChange={e => setBulk(e.target.value)} placeholder={'هر اسم یه خط\nسارا محمدی\nعلی رضایی'} />
+                <button type="button" className="btn" onClick={addBulk}>همه رو اضافه کن</button>
               </details>
             </>
           )}
           {isSample ? (
-            <p className="empty">هنوز اسمی نیست. پیش‌نمایش با چند اسم نمونه کار می‌کند؛ اولین اسم را که بنویسی، کارت‌ها با اسم‌های واقعی ساخته می‌شوند.</p>
+            <p className="empty">هنوز اسمی نیست. فعلاً پیش‌نمایش با چند تا اسم نمونه کار می‌کنه؛ اولین اسم رو که بنویسی، کارت‌ها با اسم‌های واقعی ساخته می‌شن.</p>
           ) : (
             <ol className="glist">
               {st.guests.map((g, i) => (
@@ -237,7 +237,7 @@ export default function Panel() {
             <div className="pn-bulk-act">
               <button type="button" className="btn btn--wide" onClick={() => copy(allLinks(), 'همه‌ی لینک‌ها کپی شد')}>کپی همه‌ی لینک‌ها</button>
               <button type="button" className="btn btn--wide" disabled={Boolean(busy)} onClick={downloadAll}>
-                {busy && busy.kind === 'all' ? `در حال ساخت کارت ${fa(Math.min(busy.done + 1, busy.total))} از ${fa(busy.total)}…` : 'دانلود همه‌ی کارت‌ها (ZIP)'}
+                {busy && busy.kind === 'all' ? `داره کارت ${fa(Math.min(busy.done + 1, busy.total))} از ${fa(busy.total)} ساخته می‌شه…` : 'دانلود همه‌ی کارت‌ها (ZIP)'}
               </button>
               {busy && busy.kind === 'all' && <i className="pn-progress" style={{ '--p': busy.done / busy.total }} />}
             </div>
@@ -246,15 +246,15 @@ export default function Panel() {
             <span>آدرس صفحه‌ی دعوت</span>
             <input id="base-url" dir="ltr" value={st.base || ''} placeholder={siteBase('')} disabled={!st.canEdit}
               onChange={e => act.setSettings({ base: e.target.value.trim() })} />
-            <small>لینک هر نفر همین آدرس است به‌علاوه‌ی یک کد اختصاصی. خالی بگذار تا لینک‌ها به نسخه‌ی اصلی روی Vercel بروند.</small>
+            <small>لینک هر نفر همین آدرسه به‌اضافه‌ی یه کد مخصوص خودش. خالی بذاریش، لینک‌ها می‌رن روی نسخه‌ی اصلی Vercel.</small>
           </label>
           {manual && (
             <div className="manual">
-              <span>کپی خودکار کار نکرد. متن انتخاب شده است؛ خودت کپی کن.</span>
+              <span>کپی خودکار کار نکرد؛ متن انتخاب شده، خودت کپیش کن.</span>
               <textarea id="manual-copy" readOnly value={manual} rows={4} autoFocus onFocus={e => e.target.select()} />
             </div>
           )}
-          <p className="muted small">{st.mode === 'db' ? 'فهرست در خود صفحه ذخیره می‌شود و روی هر دستگاهی که بازش کنی همین است.' : 'فهرست فقط در همین مرورگر ذخیره می‌شود.'}</p>
+          <p className="muted small">{st.mode === 'db' ? 'فهرست تو خود صفحه ذخیره می‌شه و رو هر دستگاهی بازش کنی همینه.' : 'فهرست فقط تو همین مرورگر ذخیره می‌شه.'}</p>
         </aside>
       </main>
 

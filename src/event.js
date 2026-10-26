@@ -11,8 +11,8 @@ export const EVENT = {
   start: '۱۴:۰۰',
   end: '۱۸:۳۰',
   duration: 'چهار ساعت و نیم',
-  venue: 'کافه بارمان',
-  venueEn: 'Barman Cafe',
+  venue: 'کافه باغ بارمان',
+  venueEn: 'Baarman Garden Cafe',
   latinDate: '1405.08.07',
   // Thursday 29 Oct 2026, 14:00 to 18:30 Tehran time (UTC+03:30)
   calStart: '20261029T103000Z',

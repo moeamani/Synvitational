@@ -15,8 +15,8 @@ function GuestView({ token }) {
       <div className="gv-top">
         <span className="mono">SYNVITATIONAL · {EVENT.latinDate}</span>
         {fromPanel
-          ? <button type="button" className="chip" onClick={() => { window.location.hash = ''; }}>بازگشت به پنل</button>
-          : <span>دعوت‌نامه‌ی شخصی</span>}
+          ? <button type="button" className="chip" onClick={() => { window.location.hash = ''; }}>برگرد به پنل</button>
+          : <span>فقط برای خودت</span>}
       </div>
       <Experience concept={token.concept} guests={token.guests} index={token.index} />
     </div>

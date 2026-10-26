@@ -37,10 +37,10 @@ function Domes({ guest, w, h, shown, pointer, instant }) {
         {lines.map((l, i) => <Reveal key={i} show={shown} delay={0.35 + i * 0.12}>{l}</Reveal>)}
       </div>
       <Reveal show={shown} delay={0.75} className="d-line" style={{ top: `calc(50% + ${nameH / 2 + w * 0.07}px)` }}>
-        سینتکس بی تو یک حرف کم دارد.
+        سینتکس بی تو یه حرف کم داره!
       </Reveal>
       <div className="c-bottom">
-        <Details show={shown} delay={0.95} />
+        <Details show={shown} delay={0.95} w={w} />
       </div>
     </>
   );
@@ -65,10 +65,10 @@ function Liquid({ guest, w, shown, pointer, instant }) {
       </div>
       <Fade show={shown} delay={0.6} className="l-arrow">
         <span aria-hidden="true">←</span>
-        <b>یک بعدازظهر<br />با هم</b>
+        <b>یه بعدازظهر<br />با هم</b>
       </Fade>
       <div className="l-tags">
-        <Reveal show={shown} delay={0.7} className="l-guest">مهمان: <b>{guest.name}</b></Reveal>
+        <Reveal show={shown} delay={0.7} className="l-guest">مهمون ما: <b>{guest.name}</b></Reveal>
         <Reveal show={shown} delay={0.78} className="l-tag">جلسه‌ی سازمانی</Reveal>
         <Reveal show={shown} delay={0.86} className="l-tag">تیم‌سازی</Reveal>
       </div>
@@ -79,7 +79,7 @@ function Liquid({ guest, w, shown, pointer, instant }) {
         <Reveal show={shown} delay={1.12} className="l-vn">{EVENT.venue} <span className="mono">{EVENT.venueEn.toUpperCase()}</span></Reveal>
       </div>
       <Fade show={shown} delay={1.1} className="l-body">
-        <p>{guest.name} عزیز، {EVENT.weekday} دور هم جمع می‌شویم. اول جلسه‌ی سازمانی، بعد تیم‌سازی. بدون تو جمع‌مان کامل نیست.</p>
+        <p>{callOf(guest)} جان، {EVENT.weekday} دور هم جمع می‌شیم. اول یه جلسه‌ی سازمانی داریم، بعدش تیم‌سازی. بی تو جمع‌مون جمع نیست.</p>
       </Fade>
       <svg className="l-diag" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M100 0L0 100" /></svg>
     </>
@@ -115,7 +115,7 @@ function Lineup({ guest, guests, index, w, shown, pointer, instant }) {
       <div className="u-bill">
         <Reveal show={shown} delay={0.6} className="eyebrow gold">سرِ لاین‌آپ</Reveal>
         <Reveal show={shown} delay={0.7} className="u-head" style={{ fontSize: nameSize }}>{guest.name}</Reveal>
-        {others.length > 0 && <Reveal show={shown} delay={0.8} className="u-with">و با حضور</Reveal>}
+        {others.length > 0 && <Reveal show={shown} delay={0.8} className="u-with">و بقیه‌ی بچه‌ها</Reveal>}
         {others.length > 0 && (
           <Fade show={shown} delay={0.9} className="u-names" style={{ fontSize: lineSize }}>
             {others.map((n, i) => (

@@ -1,6 +1,6 @@
 # Synvitational
 
-Personal invitations for Syntex's gathering: Thursday 7 Aban 1405, 14:00 to 18:30, Barman Cafe (کافه بارمان). An organization meeting followed by team building.
+Personal invitations for Syntex's gathering: Thursday 7 Aban 1405, 14:00 to 18:30, Baarman Garden Cafe (کافه باغ بارمان). An organization meeting followed by team building.
 
 Each guest gets their own link. It opens on a sealed envelope with their name on it; they tap the gold seal, the flap opens, the card slides out, turns upright and comes alive in 3D. Everything is in Persian, set in Kalameh.
 

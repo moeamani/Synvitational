@@ -200,7 +200,7 @@ export default function Experience({ concept, guests, index, embedded = false, o
             </motion.div>
           </div>
           <button ref={seal} className={`seal${paper ? ' is-paper' : ''}`} style={{ width: ew * 0.17, height: ew * 0.17 }}
-            onClick={e => { e.stopPropagation(); open(); }} aria-label={`باز کردن دعوت‌نامه‌ی ${guest.name}`}>
+            onClick={e => { e.stopPropagation(); open(); }} aria-label={`دعوت‌نامه‌ی ${guest.name} رو باز کن`}>
             <svg viewBox="-50 -50 100 100" aria-hidden="true">
               <defs>
                 <radialGradient id="sealg" cx="35%" cy="30%" r="80%">
@@ -223,7 +223,7 @@ export default function Experience({ concept, guests, index, embedded = false, o
           <motion.p key="hint" className="xp-hint" style={{ top: anchorY + eh / 2 + 26 }}
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0, transition: { delay: 1.1, duration: 0.8 } }}
             exit={{ opacity: 0, y: -6, transition: { duration: 0.25 } }}>
-            روی مهر بزن تا باز شود
+            بزن روی مهر تا باز شه
           </motion.p>
         )}
       </AnimatePresence>
@@ -231,11 +231,11 @@ export default function Experience({ concept, guests, index, embedded = false, o
       <AnimatePresence>
         {phase === 'open' && (
           <motion.div key="foot" className="xp-foot" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
-            <a className="btn btn--gold" href={calendarUrl(guest.name)} target="_blank" rel="noopener noreferrer">افزودن به تقویم</a>
+            <a className="btn btn--gold" href={calendarUrl(guest.name)} target="_blank" rel="noopener noreferrer">بذارش تو تقویمت</a>
             <button className="btn" type="button" onClick={saveImage} disabled={saving === 'busy'}>
-              {{ busy: 'در حال ساخت تصویر…', done: 'تصویر ذخیره شد', error: 'نشد؛ دوباره بزن' }[saving] || 'ذخیره‌ی تصویر'}
+              {{ busy: 'یه لحظه صبر کن…', done: 'عکسش ذخیره شد', error: 'نشد، دوباره بزن' }[saving] || 'عکسشو ذخیره کن'}
             </button>
-            <button className="btn" type="button" onClick={replay}>یک بار دیگر باز کن</button>
+            <button className="btn" type="button" onClick={replay}>یه بار دیگه بازش کن</button>
             {!embedded && <span className="xp-no mono">NO. {String(index + 1).padStart(2, '0')}</span>}
           </motion.div>
         )}
