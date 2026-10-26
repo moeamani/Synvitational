@@ -29,19 +29,22 @@ A guest link is the page address plus `#v1.<base64url JSON>`. The token carries 
 
 React 18, GSAP (envelope timeline), Framer Motion (card tilt, glare and text reveals), React Three Fiber + drei (the three 3D scenes, lit by a procedural studio with no HDR downloads). Vite builds one classic script with fonts and images inlined.
 
+## Live
+
+- Site and panel: https://synvitational.vercel.app
+- A guest link looks like `https://synvitational.vercel.app/#v1.…`
+
+The Vercel project `synvitational` (team lyzeapp) builds this repo on every push to `claude/bold-knuth-9uqyo8`.
+
+## Fonts
+
+Kalameh is a licensed Fontiran typeface and this repository is public, so the font files are committed only in encrypted form (`fonts/*.woff.enc`, AES-256-GCM). `scripts/fonts.mjs` unseals them before every build when the `FONT_KEY` environment variable is set; the Vercel project has it. Locally you can either set `FONT_KEY` or drop the plain `.woff` files into `fonts/`.
+
 ## Build
-
-Kalameh is a licensed Fontiran typeface and is not in this repository. Put these files in `fonts/` first:
-
-```
-kalameh-light.woff  kalameh-regular.woff  kalameh-medium.woff
-kalameh-bold.woff   kalameh-extrabold.woff  kalameh-black.woff
-```
-
-Then:
 
 ```
 npm install
-npm run dev      # local development
-npm run build    # dist/ for any static host, artifact/ for claude.ai
+npm run dev              # local development
+npm run build            # dist/, what Vercel serves
+npm run build:artifact   # artifact/, the claude.ai version of the panel
 ```
