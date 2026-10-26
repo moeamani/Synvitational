@@ -54,7 +54,7 @@ function contours(fr, width, count) {
   return lines;
 }
 
-export default function LineupScene({ shown, pointer }) {
+export default function LineupScene({ shown, pointer, instant = false }) {
   const group = useRef();
   const born = useRef(null);
   const { geo, lines } = useMemo(() => {
@@ -72,7 +72,7 @@ export default function LineupScene({ shown, pointer }) {
   useFrame((state, dt) => {
     const t = state.clock.elapsedTime;
     if (shown && born.current === null) born.current = t;
-    const k = born.current === null ? 0 : THREE.MathUtils.clamp((t - born.current) / 1.6, 0, 1);
+    const k = instant ? 1 : born.current === null ? 0 : THREE.MathUtils.clamp((t - born.current) / 1.6, 0, 1);
     const e = 1 - Math.pow(1 - k, 4);
     const g = group.current;
     const px = pointer ? pointer.x.get() : 0, py = pointer ? pointer.y.get() : 0;

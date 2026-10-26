@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import Card from './Cards.jsx';
 import { fitSize, useFontsReady } from '../fit.js';
 import { EVENT, calendarUrl } from '../event.js';
+import { renderCardPng, saveFile, pngName, isDeclined } from '../exporter.jsx';
 
 // Envelope → card. GSAP runs the physical sequence (seal, flap, slide, drop),
 // Framer Motion handles the tilt and everything typographic on the card.
@@ -62,6 +63,7 @@ export default function Experience({ concept, guests, index, embedded = false, o
   const [box, setBox] = useState({ w: 0, h: 0 });
   const [phase, setPhase] = useState('closed');
   const [run, setRun] = useState(0);
+  const [saving, setSaving] = useState('');
   useFontsReady();
 
   const guest = guests[index] || guests[0];
@@ -162,6 +164,19 @@ export default function Experience({ concept, guests, index, embedded = false, o
       .add(() => setPhase('open'), 3.4);
   }, [phase, eh, box.h]);
 
+  const saveImage = async () => {
+    if (saving === 'busy') return;
+    setSaving('busy');
+    try {
+      const blob = await renderCardPng({ concept, guests, index });
+      await saveFile(pngName(index, guest.name), blob);
+      setSaving('done');
+    } catch (e) {
+      if (!isDeclined(e)) console.error(e);
+      setSaving(isDeclined(e) ? '' : 'error');
+    }
+  };
+
   const replay = () => {
     tl.current && tl.current.kill();
     px.set(0); py.set(0);
@@ -217,6 +232,9 @@ export default function Experience({ concept, guests, index, embedded = false, o
         {phase === 'open' && (
           <motion.div key="foot" className="xp-foot" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
             <a className="btn btn--gold" href={calendarUrl(guest.name)} target="_blank" rel="noopener noreferrer">افزودن به تقویم</a>
+            <button className="btn" type="button" onClick={saveImage} disabled={saving === 'busy'}>
+              {{ busy: 'در حال ساخت تصویر…', done: 'تصویر ذخیره شد', error: 'نشد؛ دوباره بزن' }[saving] || 'ذخیره‌ی تصویر'}
+            </button>
             <button className="btn" type="button" onClick={replay}>یک بار دیگر باز کن</button>
             {!embedded && <span className="xp-no mono">NO. {String(index + 1).padStart(2, '0')}</span>}
           </motion.div>

@@ -22,8 +22,11 @@ Open the page with no hash to get the panel:
 - set the name each guest is called by (defaults to the first word)
 - pick an idea and watch it live, envelope included
 - copy one guest's link, or all links as `name: link` lines for a messenger
+- download a guest's finished card as a PNG (1080 × 1512), or every card at once as a ZIP
 
 A guest link is the page address plus `#v1.<base64url JSON>`. The token carries the idea, the guest's position and the roster, so a guest's card needs no server read. Event details live in `src/event.js`.
+
+Guests also get a "ذخیره‌ی تصویر" button once their card is open. PNGs are drawn off-screen in the card's final state with the 3D canvas at full export resolution (`src/exporter.jsx`), then captured with html-to-image.
 
 ## Stack
 

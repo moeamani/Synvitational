@@ -7,6 +7,7 @@ import { CONCEPTS, WEIGHTS, scoreOf } from '../concepts.js';
 import { makeToken, firstName } from '../token.js';
 import { EVENT, dateLine, timeLine, fa, pad2 } from '../event.js';
 import { siteBase } from '../site.js';
+import { renderCardPng, zipAll, saveFile, pngName, isDeclined } from '../exporter.jsx';
 
 // Shown only in the preview until real names are added. Never stored.
 const SAMPLE = ['سارا محمدی', 'امیرحسین نوری', 'مریم کریمی', 'علی رضایی', 'نگار صادقی', 'پویا شریفی', 'زهرا حسینی', 'کیان طاهری']
@@ -19,7 +20,7 @@ function Thumb({ id }) {
   return <span className={`thumb thumb--${id}`} aria-hidden="true"><i /><i /><i /><i /></span>;
 }
 
-function GuestRow({ g, i, active, canEdit, onSelect, onSave, onRemove, onCopy }) {
+function GuestRow({ g, i, active, canEdit, busy, onSelect, onSave, onRemove, onCopy, onPng }) {
   const [name, setName] = useState(g.name);
   const [call, setCall] = useState(g.call || '');
   useEffect(() => { setName(g.name); }, [g.name]);
@@ -41,7 +42,8 @@ function GuestRow({ g, i, active, canEdit, onSelect, onSave, onRemove, onCopy })
           placeholder={`صدا زدن: ${firstName(name)}`} onChange={e => setCall(e.target.value)} onBlur={commit} onKeyDown={key} onFocus={onSelect} />
       </div>
       <div className="gr-act">
-        <button type="button" className="chip" onClick={e => { e.stopPropagation(); onCopy(); }}>کپی لینک</button>
+        <button type="button" className="chip" aria-label={`کپی لینک ${g.name}`} onClick={e => { e.stopPropagation(); onSelect(); onCopy(); }}>لینک</button>
+        <button type="button" className="chip" aria-label={`دانلود PNG کارت ${g.name}`} disabled={busy} onClick={e => { e.stopPropagation(); onPng(); }}>PNG</button>
         {canEdit && <button type="button" className="chip chip--x" aria-label={`حذف ${g.name}`} onClick={e => { e.stopPropagation(); onRemove(); }}>×</button>}
       </div>
     </li>
@@ -58,6 +60,7 @@ export default function Panel() {
   const [phase, setPhase] = useState('closed');
   const [replay, setReplay] = useState(0);
   const toastTimer = useRef(null);
+  const [busy, setBusy] = useState(null); // { kind: 'one' | 'all', done, total }
 
   const isSample = st.guests.length === 0;
   const roster = isSample ? SAMPLE : st.guests;
@@ -95,6 +98,30 @@ export default function Panel() {
     if (!list.some(s => s.trim())) return;
     act.addGuests(list);
     setBulk('');
+  };
+  const exportFailed = e => {
+    if (isDeclined(e)) return;
+    console.error(e);
+    flash('ساختن تصویر کار نکرد. یک بار دیگر امتحان کن.');
+  };
+  const downloadOne = async i => {
+    if (busy) return;
+    setSel(i);
+    setBusy({ kind: 'one', index: i });
+    try {
+      const blob = await renderCardPng({ concept, guests: roster, index: i });
+      await saveFile(pngName(i, roster[i].name), blob);
+      flash(`کارت ${roster[i].name} ذخیره شد`);
+    } catch (e) { exportFailed(e); } finally { setBusy(null); }
+  };
+  const downloadAll = async () => {
+    if (busy) return;
+    setBusy({ kind: 'all', done: 0, total: roster.length });
+    try {
+      const zip = await zipAll({ concept, guests: roster }, (done, total) => setBusy({ kind: 'all', done, total }));
+      await saveFile(`syntex-invites-${concept}.zip`, zip);
+      flash(`${fa(roster.length)} کارت ذخیره شد`);
+    } catch (e) { exportFailed(e); } finally { setBusy(null); }
   };
   const allLinks = () => roster.map((g, i) => `${g.name}: ${linkFor(i)}`).join('\n');
   const openFull = () => {
@@ -144,6 +171,9 @@ export default function Panel() {
             <span className="pn-stage-act">
               <button type="button" className="chip" onClick={() => setReplay(r => r + 1)}>از اول</button>
               <button type="button" className="chip" onClick={openFull}>تمام‌صفحه</button>
+              <button type="button" className="chip" disabled={Boolean(busy)} onClick={() => downloadOne(idx)}>
+                {busy && busy.kind === 'one' && busy.index === idx ? 'در حال ساخت…' : 'دانلود PNG'}
+              </button>
               {!isSample && <button type="button" className="chip chip--gold" onClick={() => copy(linkFor(idx), 'لینک کپی شد')}>کپی لینک</button>}
             </span>
           </div>
@@ -194,7 +224,8 @@ export default function Panel() {
           ) : (
             <ol className="glist">
               {st.guests.map((g, i) => (
-                <GuestRow key={g.id} g={g} i={i} active={i === idx} canEdit={st.canEdit}
+                <GuestRow key={g.id} g={g} i={i} active={i === idx} canEdit={st.canEdit} busy={Boolean(busy)}
+                  onPng={() => downloadOne(i)}
                   onSelect={() => setSel(i)}
                   onSave={patch => act.updateGuest(g.id, patch)}
                   onRemove={() => { act.removeGuest(g.id); if (sel >= st.guests.length - 1) setSel(Math.max(0, st.guests.length - 2)); }}
@@ -203,7 +234,13 @@ export default function Panel() {
             </ol>
           )}
           {!isSample && (
-            <button type="button" className="btn btn--wide" onClick={() => copy(allLinks(), 'همه‌ی لینک‌ها کپی شد')}>کپی همه‌ی لینک‌ها</button>
+            <div className="pn-bulk-act">
+              <button type="button" className="btn btn--wide" onClick={() => copy(allLinks(), 'همه‌ی لینک‌ها کپی شد')}>کپی همه‌ی لینک‌ها</button>
+              <button type="button" className="btn btn--wide" disabled={Boolean(busy)} onClick={downloadAll}>
+                {busy && busy.kind === 'all' ? `در حال ساخت کارت ${fa(Math.min(busy.done + 1, busy.total))} از ${fa(busy.total)}…` : 'دانلود همه‌ی کارت‌ها (ZIP)'}
+              </button>
+              {busy && busy.kind === 'all' && <i className="pn-progress" style={{ '--p': busy.done / busy.total }} />}
+            </div>
           )}
           <label className="base" htmlFor="base-url">
             <span>آدرس صفحه‌ی دعوت</span>

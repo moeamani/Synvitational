@@ -24,14 +24,14 @@ function chevronGeometry(depth = 0.42) {
   return g;
 }
 
-function Chevron({ geometry, material, base, shown, pointer, delay = 0, spin = 1 }) {
+function Chevron({ geometry, material, base, shown, pointer, delay = 0, spin = 1, instant = false }) {
   const ref = useRef();
   const born = useRef(null);
   useFrame((state, dt) => {
     const t = state.clock.elapsedTime;
     const m = ref.current;
     if (shown && born.current === null) born.current = t;
-    const k = born.current === null ? 0 : THREE.MathUtils.clamp((t - born.current - delay) / 1.4, 0, 1);
+    const k = instant ? 1 : born.current === null ? 0 : THREE.MathUtils.clamp((t - born.current - delay) / 1.4, 0, 1);
     const e = 1 - Math.pow(1 - k, 4);
     const px = pointer ? pointer.x.get() : 0, py = pointer ? pointer.y.get() : 0;
     m.position.set(base.p[0], base.p[1] + (1 - e) * -2.2 + Math.sin(t * 0.9 + delay * 4) * 0.06, base.p[2]);
@@ -44,7 +44,7 @@ function Chevron({ geometry, material, base, shown, pointer, delay = 0, spin = 1
   return <mesh ref={ref} geometry={geometry} material={material} scale={0.01} />;
 }
 
-export default function LiquidScene({ shown, pointer }) {
+export default function LiquidScene({ shown, pointer, instant = false }) {
   const geometry = useMemo(() => chevronGeometry(), []);
   const gold = useMemo(() => new THREE.MeshPhysicalMaterial({
     color: '#f0c24a', metalness: 1, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.6,
@@ -55,9 +55,9 @@ export default function LiquidScene({ shown, pointer }) {
   return (
     <>
       <StudioLights warm />
-      <Chevron geometry={geometry} material={gold} shown={shown} pointer={pointer}
+      <Chevron geometry={geometry} material={gold} shown={shown} pointer={pointer} instant={instant}
         base={{ p: [-0.78, 0.12, 0], r: [0.22, -0.32, 0.12], s: 0.78 }} />
-      <Chevron geometry={geometry} material={graphite} shown={shown} pointer={pointer} delay={0.25} spin={-1}
+      <Chevron geometry={geometry} material={graphite} shown={shown} pointer={pointer} instant={instant} delay={0.25} spin={-1}
         base={{ p: [-0.72, -0.7, 0.1], r: [-0.18, 0.3, Math.PI - 0.08], s: 0.42 }} />
     </>
   );

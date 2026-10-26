@@ -1,9 +1,16 @@
+import { createContext, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { EVENT, dateLine, timeLine } from '../event.js';
 import wordmarkUrl from '../assets/syntex-wordmark.png';
 
 const EASE = [0.16, 1, 0.3, 1];
+
+// Set when a card is drawn off-screen for a PNG: 3D scenes skip their intro,
+// the canvas renders at export resolution and reports when it exists.
+// Text needs nothing: mounted with show already true, framer starts it at rest.
+export const ExportContext = createContext(null);
+export const useExport = () => useContext(ExportContext);
 
 // Masked line reveal: the line rises out of its own box.
 export function Reveal({ show, delay = 0, className = '', style, children, as: Tag = 'div' }) {
@@ -47,9 +54,12 @@ export function Wordmark({ ink = false, className = '' }) {
 }
 
 export function GL({ children, camera = { position: [0, 0, 6], fov: 35 } }) {
+  const ex = useExport();
   return (
     <div className="gl" aria-hidden="true">
-      <Canvas dpr={[1, 1.75]} gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }} camera={camera} resize={{ offsetSize: true }}>
+      <Canvas dpr={ex ? ex.dpr : [1, 1.75]} camera={camera} resize={{ offsetSize: true }}
+        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: Boolean(ex) }}
+        onCreated={() => ex && ex.onReady()}>
         {children}
       </Canvas>
     </div>

@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { EVENT, fa, pad2, timeLine, dateLine } from '../event.js';
 import { callOf } from '../token.js';
 import { fitSize, measure } from '../fit.js';
-import { Reveal, Fade, Grain, Wordmark, GL, Details, Sparkle } from './bits.jsx';
+import { Reveal, Fade, Grain, Wordmark, GL, Details, Sparkle, useExport } from './bits.jsx';
 import DomesScene from '../scenes/DomesScene.jsx';
 import LiquidScene from '../scenes/LiquidScene.jsx';
 import LineupScene from '../scenes/LineupScene.jsx';
@@ -19,7 +19,7 @@ function splitLines(name) {
 }
 
 // ۰۱ · Domes
-function Domes({ guest, w, h, shown, pointer }) {
+function Domes({ guest, w, h, shown, pointer, instant }) {
   const lines = splitLines(guest.name);
   const block = w * 0.4;
   const size = Math.min(...lines.map(l => fitSize(l, w * 0.84, w * 0.2, 12, 900)), block / (lines.length * 1.04));
@@ -27,7 +27,7 @@ function Domes({ guest, w, h, shown, pointer }) {
   const gap = ((nameH + w * 0.4) / h) * VIEW_H;
   return (
     <>
-      <GL><DomesScene shown={shown} pointer={pointer} gap={gap} /></GL>
+      <GL><DomesScene shown={shown} pointer={pointer} gap={gap} instant={instant} /></GL>
       <Grain />
       <div className="c-top">
         <Reveal show={shown} delay={0.15} className="eyebrow gold">{EVENT.kind}</Reveal>
@@ -47,13 +47,13 @@ function Domes({ guest, w, h, shown, pointer }) {
 }
 
 // ۰۲ · Liquid gold, on paper
-function Liquid({ guest, w, shown, pointer }) {
+function Liquid({ guest, w, shown, pointer, instant }) {
   const call = callOf(guest);
   const l1 = `${call}،`;
   const headSize = fitSize(l1, w * 0.58, w * 0.205, w * 0.09, 900);
   return (
     <>
-      <GL><LiquidScene shown={shown} pointer={pointer} /></GL>
+      <GL><LiquidScene shown={shown} pointer={pointer} instant={instant} /></GL>
       <Grain paper />
       <div className="c-top l-top">
         <Reveal show={shown} delay={0.1} className="l-tiny">{EVENT.title} · {EVENT.year}</Reveal>
@@ -87,7 +87,7 @@ function Liquid({ guest, w, shown, pointer }) {
 }
 
 // ۰۳ · Lineup: everyone on the bill, the guest as headliner
-function Lineup({ guest, guests, index, w, shown, pointer }) {
+function Lineup({ guest, guests, index, w, shown, pointer, instant }) {
   const others = guests.filter((_, i) => i !== index).map(g => g.name);
   const nameSize = fitSize(guest.name, w * 0.84, w * 0.12, 10, 900);
   const joined = others.join('  |  ');
@@ -102,7 +102,7 @@ function Lineup({ guest, guests, index, w, shown, pointer }) {
     <>
       <Fade show={shown} delay={0.1} className="u-num u-day">{pad2(7)}</Fade>
       <Fade show={shown} delay={0.25} className="u-num u-month">{EVENT.month}</Fade>
-      <GL><LineupScene shown={shown} pointer={pointer} /></GL>
+      <GL><LineupScene shown={shown} pointer={pointer} instant={instant} /></GL>
       <Grain />
       <div className="c-top">
         <Reveal show={shown} delay={0.2} className="u-time">{timeLine}</Reveal>
@@ -132,12 +132,13 @@ function Lineup({ guest, guests, index, w, shown, pointer }) {
 const MAP = { domes: Domes, liquid: Liquid, lineup: Lineup };
 
 export default function Card({ concept, guests, index, w, shown, pointer }) {
+  const instant = Boolean(useExport());
   const Comp = MAP[concept] || Domes;
   const h = Math.round((w * 7) / 5);
   const guest = guests[index] || guests[0];
   return (
-    <div className={`card card--${concept in MAP ? concept : 'domes'}`} style={{ width: w, height: h, '--w': `${w}px` }}>
-      <Comp guest={guest} guests={guests} index={index} w={w} h={h} shown={shown} pointer={pointer} />
+    <div className={`card card--${concept in MAP ? concept : 'domes'}${instant ? ' card--export' : ''}`} style={{ width: w, height: h, '--w': `${w}px` }}>
+      <Comp guest={guest} guests={guests} index={index} w={w} h={h} shown={shown} pointer={pointer} instant={instant} />
     </div>
   );
 }

@@ -58,7 +58,7 @@ void main() {
   #include <colorspace_fragment>
 }`;
 
-function Dome({ radius, rim, mid, core, halo, dir, gap, shown, pointer, light }) {
+function Dome({ radius, rim, mid, core, halo, dir, gap, shown, pointer, light, instant }) {
   const group = useRef();
   const body = useMemo(() => new THREE.ShaderMaterial({
     vertexShader: vert,
@@ -93,11 +93,12 @@ function Dome({ radius, rim, mid, core, halo, dir, gap, shown, pointer, light })
     const t = state.clock.elapsedTime;
     const target = shown ? dir * (radius + gap / 2 + Math.sin(t * 0.7) * 0.025) : dir * (radius + 2.4);
     const g = group.current;
-    g.position.y = THREE.MathUtils.damp(g.position.y, target, shown ? 2.2 : 6, dt);
+    g.position.y = instant ? target : THREE.MathUtils.damp(g.position.y, target, shown ? 2.2 : 6, dt);
     g.position.x = THREE.MathUtils.damp(g.position.x, (pointer ? pointer.x.get() : 0) * -0.08 * dir, 3, dt);
     const gainTo = shown ? 1 : 0.35;
-    body.uniforms.uGain.value = THREE.MathUtils.damp(body.uniforms.uGain.value, gainTo, 1.6, dt);
-    glow.uniforms.uGain.value = THREE.MathUtils.damp(glow.uniforms.uGain.value, shown ? 0.75 : 0, 1.2, dt);
+    const glowTo = shown ? 0.75 : 0;
+    body.uniforms.uGain.value = instant ? gainTo : THREE.MathUtils.damp(body.uniforms.uGain.value, gainTo, 1.6, dt);
+    glow.uniforms.uGain.value = instant ? glowTo : THREE.MathUtils.damp(glow.uniforms.uGain.value, glowTo, 1.2, dt);
     body.uniforms.uTime.value = t;
     glow.uniforms.uTime.value = t;
   });
@@ -114,7 +115,7 @@ function Dome({ radius, rim, mid, core, halo, dir, gap, shown, pointer, light })
   );
 }
 
-export default function DomesScene({ shown, pointer, gap = 1.4 }) {
+export default function DomesScene({ shown, pointer, gap = 1.4, instant = false }) {
   const light = useMemo(() => new THREE.Vector3(0, 0, -0.9), []);
   useFrame((state, dt) => {
     const px = pointer ? pointer.x.get() : 0;
@@ -124,9 +125,9 @@ export default function DomesScene({ shown, pointer, gap = 1.4 }) {
   });
   return (
     <>
-      <Dome radius={1.95} dir={1} gap={gap} shown={shown} pointer={pointer} light={light}
+      <Dome radius={1.95} dir={1} gap={gap} shown={shown} pointer={pointer} light={light} instant={instant}
         rim="#ffe7a1" mid="#ddb12a" core="#0b0904" halo="#ddb12a" />
-      <Dome radius={1.95} dir={-1} gap={gap} shown={shown} pointer={pointer} light={light}
+      <Dome radius={1.95} dir={-1} gap={gap} shown={shown} pointer={pointer} light={light} instant={instant}
         rim="#f1efe9" mid="#7d7d7d" core="#080808" halo="#9a9a9a" />
     </>
   );
