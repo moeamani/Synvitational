@@ -4,8 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && node scripts/artifact.mjs",
+    "dev": "node scripts/fonts.mjs && vite",
+    "prebuild": "node scripts/fonts.mjs",
+    "build": "vite build",
+    "build:artifact": "npm run build && node scripts/artifact.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

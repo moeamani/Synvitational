@@ -6,12 +6,12 @@ import { useStore } from '../store.js';
 import { CONCEPTS, WEIGHTS, scoreOf } from '../concepts.js';
 import { makeToken, firstName } from '../token.js';
 import { EVENT, dateLine, timeLine, fa, pad2 } from '../event.js';
+import { siteBase } from '../site.js';
 
 // Shown only in the preview until real names are added. Never stored.
 const SAMPLE = ['سارا محمدی', 'امیرحسین نوری', 'مریم کریمی', 'علی رضایی', 'نگار صادقی', 'پویا شریفی', 'زهرا حسینی', 'کیان طاهری']
   .map((name, i) => ({ id: `sample-${i}`, name, call: '' }));
 
-export const DEFAULT_BASE = 'https://claude.ai/artifact/756LuYCQ8pRuKdKxKb8XDJ';
 
 const score = c => fa(scoreOf(c).toFixed(1)).replace('.', '٫');
 
@@ -64,7 +64,7 @@ export default function Panel() {
   const idx = Math.min(sel, roster.length - 1);
   const concept = CONCEPTS.find(c => c.id === st.concept) ? st.concept : CONCEPTS[0].id;
   const current = CONCEPTS.find(c => c.id === concept);
-  const base = (st.base || DEFAULT_BASE).replace(/#.*$/, '');
+  const base = siteBase(st.base);
   const tokenFor = i => makeToken({ concept, index: i, guests: roster });
   const linkFor = i => `${base}#${tokenFor(i)}`;
 
@@ -207,9 +207,9 @@ export default function Panel() {
           )}
           <label className="base" htmlFor="base-url">
             <span>آدرس صفحه‌ی دعوت</span>
-            <input id="base-url" dir="ltr" value={st.base || ''} placeholder={DEFAULT_BASE} disabled={!st.canEdit}
+            <input id="base-url" dir="ltr" value={st.base || ''} placeholder={siteBase('')} disabled={!st.canEdit}
               onChange={e => act.setSettings({ base: e.target.value.trim() })} />
-            <small>لینک هر نفر همین آدرس است به‌علاوه‌ی یک کد اختصاصی. برای اینکه مهمان‌ها بتوانند بازش کنند، صفحه باید با لینک عمومی به اشتراک گذاشته شده باشد.</small>
+            <small>لینک هر نفر همین آدرس است به‌علاوه‌ی یک کد اختصاصی. خالی بگذار تا لینک‌ها به نسخه‌ی اصلی روی Vercel بروند.</small>
           </label>
           {manual && (
             <div className="manual">

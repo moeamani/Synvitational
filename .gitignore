@@ -2,5 +2,5 @@ node_modules/
 dist/
 artifact/
 # Kalameh is a licensed Fontiran typeface: keep it out of this public repo.
-fonts/kalameh-*
+fonts/kalameh-*.woff
 .DS_Store
